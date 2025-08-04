@@ -1,0 +1,11 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/jonnie/raylib/Projects/raymarching-project/build/cmake_install.cmake",
+		"/home/jonnie/raylib/Projects/raymarching-project/build/libraries/raylib/cmake_install.cmake",
+		"/home/jonnie/raylib/Projects/raymarching-project/build/libraries/raylib/raylib/cmake_install.cmake",
+		"/home/jonnie/raylib/Projects/raymarching-project/build/libraries/raylib/raylib/external/glfw/cmake_install.cmake",
+		"/home/jonnie/raylib/Projects/raymarching-project/build/libraries/raylib/raylib/external/glfw/src/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

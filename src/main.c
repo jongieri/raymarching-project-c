@@ -1,0 +1,102 @@
+// A ray marching program written in C and OpenGL using the raylib library!
+// Built using CMake
+// Created by Jonnie Gieringer
+
+#include "raylib.h"
+
+// Define OpenGL version
+#if defined(PLATFORM_DESKTOP)
+#define GLSL_VERSION 330
+#else
+#define GLSL_VERSION 100
+#endif
+
+// Program main entry point
+int main(void)
+{
+
+    // Initialization
+
+    const int screenWidth = 1920;
+    const int screenHeight = 1080;
+
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(screenWidth, screenHeight, "raymarching project");
+
+    Camera camera = { 0 };
+    camera.position = (Vector3) { 2.5f, 0.5f, 3.0f }; // Camera position
+    camera.target = (Vector3) { 0.0f, 0.0f, 0.7f }; // Camera looking at point
+    camera.up = (Vector3) { 0.0f, 1.0f, 0.0f }; // Camera up vector (rotation towards target)
+    camera.fovy = 65.0f; // Camera field-of-view Y
+    camera.projection = CAMERA_PERSPECTIVE; // Camera projection type
+
+    // Load raymarching shader
+    // NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default
+    // vertex shader
+    Shader shader = LoadShader(
+        0, TextFormat("resources/shaders/glsl%i/raymarching.fs", GLSL_VERSION));
+
+    // Get shader locations for required uniforms
+    int viewEyeLoc = GetShaderLocation(shader, "viewEye");
+    int viewCenterLoc = GetShaderLocation(shader, "viewCenter");
+    int runTimeLoc = GetShaderLocation(shader, "runTime");
+    int resolutionLoc = GetShaderLocation(shader, "resolution");
+
+    float resolution[2] = { (float)screenWidth, (float)screenHeight };
+    SetShaderValue(shader, resolutionLoc, resolution, SHADER_UNIFORM_VEC2);
+
+    float runTime = 0.0f;
+
+    DisableCursor(); // Limit cursor to relative movement inside the window
+    SetTargetFPS(60); // Set window to run at 60 frames-per-second
+    //--------------------------------------------------------------------------------------
+
+    // Main game loop
+    while (!WindowShouldClose()) // Detect window close button or ESC key
+    {
+        // Update
+        //----------------------------------------------------------------------------------
+        UpdateCamera(&camera, CAMERA_FIRST_PERSON);
+
+        float cameraPos[3] = { camera.position.x, camera.position.y,
+            camera.position.z };
+        float cameraTarget[3] = { camera.target.x, camera.target.y, camera.target.z };
+
+        float deltaTime = GetFrameTime();
+        runTime += deltaTime;
+
+        // Set shader required uniform values
+        SetShaderValue(shader, viewEyeLoc, cameraPos, SHADER_UNIFORM_VEC3);
+        SetShaderValue(shader, viewCenterLoc, cameraTarget, SHADER_UNIFORM_VEC3);
+        SetShaderValue(shader, runTimeLoc, &runTime, SHADER_UNIFORM_FLOAT);
+
+        // Check if screen is resized
+        if (IsWindowResized()) {
+            resolution[0] = (float)GetScreenWidth();
+            resolution[1] = (float)GetScreenHeight();
+            SetShaderValue(shader, resolutionLoc, resolution, SHADER_UNIFORM_VEC2);
+        }
+
+        // Draw
+
+        BeginDrawing();
+
+        ClearBackground(RAYWHITE);
+
+        // We only draw a white full-screen rectangle,
+        // frame is generated in shader using raymarching
+        BeginShaderMode(shader);
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), WHITE);
+        EndShaderMode();
+
+        EndDrawing();
+    }
+
+    // De-Initialization
+
+    UnloadShader(shader); // Unload shader
+
+    CloseWindow(); // Close window and OpenGL context
+
+    return 0;
+}
