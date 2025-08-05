@@ -1,10 +1,10 @@
-// A ray marching program written in C and OpenGL using the raylib library!
+// A ray marching program written in C and OpenGL shader language using the raylib library
 // Built using CMake
 // Created by Jonnie Gieringer
 
 #include "raylib.h"
 
-// Define OpenGL version
+// Define OpenGL version for device program is running on
 #if defined(PLATFORM_DESKTOP)
 #define GLSL_VERSION 330
 #else
@@ -14,11 +14,10 @@
 // Program main entry point
 int main(void)
 {
-
     // Initialization
 
-    const int screenWidth = 1920;
-    const int screenHeight = 1080;
+    const int screenWidth = 1280;
+    const int screenHeight = 720;
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(screenWidth, screenHeight, "raymarching project");
@@ -34,7 +33,8 @@ int main(void)
     // NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default
     // vertex shader
     Shader shader = LoadShader(
-        0, TextFormat("resources/shaders/glsl%i/raymarching.fs", GLSL_VERSION));
+        0, TextFormat("resources/shaders/glsl%i/raymarching.fs", GLSL_VERSION)
+    );
 
     // Get shader locations for required uniforms
     int viewEyeLoc = GetShaderLocation(shader, "viewEye");
@@ -49,17 +49,16 @@ int main(void)
 
     DisableCursor(); // Limit cursor to relative movement inside the window
     SetTargetFPS(60); // Set window to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
 
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         // Update
-        //----------------------------------------------------------------------------------
         UpdateCamera(&camera, CAMERA_FIRST_PERSON);
 
-        float cameraPos[3] = { camera.position.x, camera.position.y,
-            camera.position.z };
+        float cameraPos[3] = { 
+        camera.position.x, camera.position.y,camera.position.z 
+    };
         float cameraTarget[3] = { camera.target.x, camera.target.y, camera.target.z };
 
         float deltaTime = GetFrameTime();
@@ -78,7 +77,6 @@ int main(void)
         }
 
         // Draw
-
         BeginDrawing();
 
         ClearBackground(RAYWHITE);
@@ -93,7 +91,6 @@ int main(void)
     }
 
     // De-Initialization
-
     UnloadShader(shader); // Unload shader
 
     CloseWindow(); // Close window and OpenGL context
