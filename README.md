@@ -1,5 +1,7 @@
 # Raymarching Project in C!
 
-A graphics demo using the raylib library!
+A first-person graphics demo using the raylib library!
+
+Built using CMake
 
 Created by Jonnie Gieringer
